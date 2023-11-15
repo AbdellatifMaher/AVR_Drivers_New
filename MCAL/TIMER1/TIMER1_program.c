@@ -1,0 +1,300 @@
+/*
+ * Timer1_program.c
+ *
+ *  Created on: Mar 27, 2021
+ *      Author: 8
+ */
+
+
+#include "../../LIB/STD_TYPES.h"
+#include "../../LIB/BIT_MATH.h"
+#include "../DIO/DIO_interface.h"
+#include "TIMER1_interface.h"
+#include "TIMER1_private.h"
+#include "TIMER1_config.h"
+
+void (*TIMER1_CallBack[4])(void) ={NULL} ;
+
+void TIMER1_voidInit(void)
+{
+        #if     TIMER1_MODE ==  TIMER1_NORMAL_MODE
+
+			CLR_BIT(TCCR1B,4); CLR_BIT(TCCR1B,3);CLR_BIT(TCCR1A,1); CLR_BIT(TCCR1A,0);
+
+		#elif	TIMER1_MODE ==	TIMER1_PWM_PHASE_8_BIT_MODE
+
+			CLR_BIT(TCCR1B,4); CLR_BIT(TCCR1B,3);CLR_BIT(TCCR1A,1); SET_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_PWM_PHASE_9_BIT_MODE
+
+			CLR_BIT(TCCR1B,4); CLR_BIT(TCCR1B,3);SET_BIT(TCCR1A,1); CLR_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_PWM_PHASE_10_BIT_MODE
+
+			CLR_BIT(TCCR1B,4); CLR_BIT(TCCR1B,3);SET_BIT(TCCR1A,1); SET_BIT(TCCR1A,0);
+
+		#elif	TIMER1_MODE ==	TIMER1_CTC_OCR1A_MODE
+
+			CLR_BIT(TCCR1B,4); SET_BIT(TCCR1B,3);CLR_BIT(TCCR1A,1); CLR_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_FAST_PWM_8_BIT_MODE
+
+			CLR_BIT(TCCR1B,4); SET_BIT(TCCR1B,3);CLR_BIT(TCCR1A,1); SET_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_FAST_PWM_9_BIT_MODE
+
+			CLR_BIT(TCCR1B,4); SET_BIT(TCCR1B,3);SET_BIT(TCCR1A,1); CLR_BIT(TCCR1A,0);
+
+		#elif	TIMER1_MODE ==	TIMER1_FAST_PWM_10_BIT_MODE
+
+			CLR_BIT(TCCR1B,4); SET_BIT(TCCR1B,3);SET_BIT(TCCR1A,1); SET_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_PWM_FREQUENCY_ICR1_MODE
+
+			SET_BIT(TCCR1B,4); CLR_BIT(TCCR1B,3);CLR_BIT(TCCR1A,1); CLR_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_PWM_FREQUENCY_OCR1A_MODE
+
+			SET_BIT(TCCR1B,4); CLR_BIT(TCCR1B,3);CLR_BIT(TCCR1A,1); SET_BIT(TCCR1A,0);
+
+		#elif	TIMER1_MODE ==	TIMER1_PWM_PHASE_ICR1_MODE
+
+			SET_BIT(TCCR1B,4); CLR_BIT(TCCR1B,3);SET_BIT(TCCR1A,1); CLR_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_PWM_PHASE_OCR1A_MODE
+
+			SET_BIT(TCCR1B,4); CLR_BIT(TCCR1B,3);SET_BIT(TCCR1A,1); SET_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_CTC_ICR1_MODE
+
+			SET_BIT(TCCR1B,4); SET_BIT(TCCR1B,3);CLR_BIT(TCCR1A,1); CLR_BIT(TCCR1A,0);
+		#elif   TIMER1_MODE == TIMER1_FAST_PWM_ICR1_MODE
+
+			SET_BIT(TCCR1B,4); SET_BIT(TCCR1B,3);SET_BIT(TCCR1A,1); SET_BIT(TCCR1A,0);
+
+		#elif   TIMER1_MODE == TIMER1_FAST_PWM_OCR1A_MODE
+
+			SET_BIT(TCCR1B,4); SET_BIT(TCCR1B,3);SET_BIT(TCCR1A,1); SET_BIT(TCCR1A,0);
+
+
+		#endif
+
+		#if TIMER1_PRESCALLER == TIMER1_NO_CLOCK
+			CLR_BIT(TCCR1B,2);CLR_BIT(TCCR1B,1);CLR_BIT(TCCR1B,0);
+		#elif TIMER1_PRESCALLER == TIMER1_NO_PRE
+			CLR_BIT(TCCR1B,2);CLR_BIT(TCCR1B,1);SET_BIT(TCCR1B,0);
+		#elif TIMER1_PRESCALLER == TIMER1_8_PRE
+			CLR_BIT(TCCR1B,2);SET_BIT(TCCR1B,1);CLR_BIT(TCCR1B,0);
+		#elif TIMER1_PRESCALLER == TIMER1_64_PRE
+			CLR_BIT(TCCR1B,2);SET_BIT(TCCR1B,1);SET_BIT(TCCR1B,0);
+		#elif TIMER1_PRESCALLER == TIMER1_256_PRE
+			SET_BIT(TCCR1B,2);CLR_BIT(TCCR1B,1);CLR_BIT(TCCR1B,0);
+		#elif TIMER1_PRESCALLER == TIMER1_1024_PRE
+			SET_BIT(TCCR1B,2);CLR_BIT(TCCR1B,1);SET_BIT(TCCR1B,0);
+		#elif TIMER1_PRESCALLER == TIMER1_EXT_FALLING
+			SET_BIT(TCCR1B,2);SET_BIT(TCCR1B,1);CLR_BIT(TCCR1B,0);
+		#elif TIMER1_PRESCALLER == TIMER1_EXT_RISING
+			SET_BIT(TCCR1B,2);SER_BIT(TCCR1B,1);SET_BIT(TCCR1B,0);
+		#endif
+
+		#if TIMER1_CHA_OCR1_MODE == TIMER1_DISCONNECTED_OC1
+			  CLR_BIT(TCCR1A,7);CLR_BIT(TCCR1A,6);
+		#elif TIMER1_CHA_OCR1_MODE == TIMER1_TOGGLE_OC1
+			  CLR_BIT(TCCR1A,7);SET_BIT(TCCR1A,6);
+		#elif TIMER1_CHA_OCR1_MODE == TIMER1_CLEAR_OC1
+			   SET_BIT(TCCR1A,7);CLR_BIT(TCCR1A,6);
+		#elif TIMER1_CHA_OCR1_MODE == TIMER1_SET_OC1
+			   SET_BIT(TCCR1A,7);SET_BIT(TCCR1A,6);
+		#endif
+
+		#if TIMER1_CHB_OCR1_MODE == TIMER1_DISCONNECTED_OC1
+			  CLR_BIT(TCCR1A,5);CLR_BIT(TCCR1A,4);
+		#elif TIMER1_CHB_OCR1_MODE == TIMER1_TOGGLE_OC1
+			  CLR_BIT(TCCR1A,5);SET_BIT(TCCR1A,4);
+		#elif TIMER1_CHB_OCR1_MODE == TIMER1_CLEAR_OC1
+			   SET_BIT(TCCR1A,5);CLR_BIT(TCCR1A,4);
+		#elif TIMER1_CHB_OCR1_MODE == TIMER1_SET_OC1
+			   SET_BIT(TCCR1A,5);SET_BIT(TCCR1A,4);
+		#endif
+
+		#if TIMER1_INPUT_CAPTURE_EDGE == INPUT_CAPTURE_FALLING_EDGE
+			   CLR_BIT(TCCR1B,6);
+		#elif TIMER1_INPUT_CAPTURE_EDGE == INPUT_CAPTURE_RISING_EDGE
+			   SET_BIT(TCCR1B,6);
+		#endif
+
+		#if TIMER1_INTERRUPT == TIMER1_INT_DISABLE
+			   CLR_BIT(TIMSK,5);CLR_BIT(TIMSK,4);CLR_BIT(TIMSK,3);CLR_BIT(TIMSK,2);
+		#elif TIMER1_INTERRUPT == TIMER1_INT_OVERFLOW
+			   CLR_BIT(TIMSK,5);CLR_BIT(TIMSK,4);CLR_BIT(TIMSK,3);SET_BIT(TIMSK,2);
+		#elif TIMER1_INTERRUPT == TIMER1_INT_COMP_B_MATCH
+			   CLR_BIT(TIMSK,5);CLR_BIT(TIMSK,4);SET_BIT(TIMSK,3);CLR_BIT(TIMSK,2);
+		#elif TIMER1_INTERRUPT == TIMER1_INT_COMP_A_MATCH
+			   CLR_BIT(TIMSK,5);SET_BIT(TIMSK,4);CLR_BIT(TIMSK,3);CLR_BIT(TIMSK,2);
+		#elif TIMER1_INTERRUPT == TIMER1_INT_COMP_BOTH_MATCH
+			   CLR_BIT(TIMSK,5);SET_BIT(TIMSK,4);SET_BIT(TIMSK,3);CLR_BIT(TIMSK,2);
+		#elif TIMER1_INTERRUPT == TIMER1_INT_INPUT_CAPTURE
+			   SET_BIT(TIMSK,5);CLR_BIT(TIMSK,4);CLR_BIT(TIMSK,3);CLR_BIT(TIMSK,2);
+		#elif TIMER1_INTERRUPT == TIMER1_INT_OVF_IC_BOTH
+			   SET_BIT(TIMSK,5);CLR_BIT(TIMSK,4);CLR_BIT(TIMSK,3);SET_BIT(TIMSK,2);
+		#endif
+
+}
+void TIMER1_voidSetOCRA(u16 Copy_u16OCR)
+{
+	OCR1A = Copy_u16OCR;
+
+}
+void TIMER1_voidSetOCRB(u16 Copy_u16OCR)
+{
+	OCR1B = Copy_u16OCR;
+}
+void TIMER1_voidSetICR1(u32 Copy_u32ICR)
+{
+	ICR1 =  Copy_u32ICR;
+}
+u16  TIMER1_u16GetICR1(void)
+{
+	return ICR1;
+}
+void TIMER1_voidChangeEdge(u8 Copy_u8Edge)
+{
+		#if Copy_u8Edge == INPUT_CAPTURE_FALLING_EDGE
+			   CLR_BIT(TCCR1B,6);
+		#elif Copy_u8Edge == INPUT_CAPTURE_RISING_EDGE
+			   SET_BIT(TCCR1B,6);
+		#endif
+}
+void TIMER1_voidClearFlag(u8 Copy_u8Interrupt)
+{
+	if ( Copy_u8Interrupt == TIMER1_INT_OVERFLOW )
+	{
+		SET_BIT(TIFR,2);
+	}
+	else if (Copy_u8Interrupt == TIMER1_INT_COMP_B_MATCH )
+	{
+		SET_BIT(TIFR,3);
+	}
+	else if (Copy_u8Interrupt == TIMER1_INT_COMP_A_MATCH )
+	{
+		SET_BIT(TIFR,4);
+	}
+	else if(Copy_u8Interrupt == TIMER1_INT_INPUT_CAPTURE )
+	{
+		SET_BIT(TIFR,5);
+	}
+
+}
+u8   TIMER1_u8GetFlag(u8 Copy_u8Interrupt)
+{
+	u8 LOC_u8Ret = 0;
+	if ( Copy_u8Interrupt == TIMER1_INT_OVERFLOW )
+		{
+		LOC_u8Ret = GET_BIT(TIFR,2);
+		}
+		else if (Copy_u8Interrupt == TIMER1_INT_COMP_B_MATCH )
+		{
+			LOC_u8Ret = GET_BIT(TIFR,3);
+		}
+		else if (Copy_u8Interrupt == TIMER1_INT_COMP_A_MATCH )
+		{
+			LOC_u8Ret = GET_BIT(TIFR,4);
+		}
+		else if(Copy_u8Interrupt == TIMER1_INT_INPUT_CAPTURE )
+		{
+			LOC_u8Ret = GET_BIT(TIFR,5);
+		}
+
+	return LOC_u8Ret;
+}
+void TIMER1_voidDisableInterrupt(void)
+{
+	TIMSK &= 0b11000011;
+	TIMSK |= (TIMER1_INT_DISABLE << 2);
+}
+void TIMER1_voidEnableInterrupt(u8 Copy_u8Interrupt)
+{
+	TIMSK &= 0b11000011;
+	TIMSK |= (Copy_u8Interrupt << 2);
+}
+void TIMER1_voidPWM(u16 Copy_u16OCRON,u8 Copy_u8Channel)
+{
+
+	if(Copy_u8Channel == 1)
+	{
+		DIO_enumSetPinDirection(DIO_PORTD,DIO_PIN5,DIO_OUTPUT);
+		TIMER1_voidSetOCRA(Copy_u16OCRON);
+	}
+	else if(Copy_u8Channel == 2)
+	{
+		DIO_enumSetPinDirection(DIO_PORTD,DIO_PIN4,DIO_OUTPUT);
+		TIMER1_voidSetOCRB(Copy_u16OCRON);
+	}
+
+
+}
+void TIMER1_voidSetCallBack( void(*Copy_pvoidCallBack)(void) , u8 Copy_u8Interrupt )
+{
+	if(Copy_pvoidCallBack != NULL)
+	{
+		if( Copy_u8Interrupt == TIMER1_INT_INPUT_CAPTURE )
+		{
+		     TIMER1_CallBack[0] = Copy_pvoidCallBack;
+		}
+		else if( Copy_u8Interrupt == TIMER1_INT_COMP_A_MATCH )
+		{
+			TIMER1_CallBack[1] = Copy_pvoidCallBack;
+		}
+		else if ( Copy_u8Interrupt == TIMER1_INT_COMP_B_MATCH )
+		{
+			TIMER1_CallBack[2] = Copy_pvoidCallBack;
+		}
+		else if ( Copy_u8Interrupt == TIMER1_INT_OVERFLOW )
+		{
+			TIMER1_CallBack[3] = Copy_pvoidCallBack;
+		}
+	}
+}
+
+void __vector_6(void) __attribute__((signal));
+void __vector_6(void)
+{
+	if(TIMER1_CallBack[0] != NULL)
+	{
+		TIMER1_CallBack[0]();
+		TIMER1_voidClearFlag(TIMER1_INT_INPUT_CAPTURE);
+	}
+
+}
+
+void __vector_7(void) __attribute__((signal));
+void __vector_7(void)
+{
+	if(TIMER1_CallBack[1] !=NULL)
+	{
+		TIMER1_CallBack[1]();
+		TIMER1_voidClearFlag(TIMER1_INT_COMP_A_MATCH);
+	}
+
+}
+
+void __vector_8(void) __attribute__((signal));
+void __vector_8(void)
+{
+	if(TIMER1_CallBack[2] !=NULL)
+	{
+		TIMER1_CallBack[2]();
+		TIMER1_voidClearFlag(TIMER1_INT_COMP_B_MATCH);
+	}
+
+}
+
+void __vector_9(void) __attribute__((signal));
+void __vector_9(void)
+{
+	if(TIMER1_CallBack[3] !=NULL)
+	{
+	   TIMER1_CallBack[3]();
+	   TIMER1_voidClearFlag(TIMER1_INT_OVERFLOW);
+	}
+}
