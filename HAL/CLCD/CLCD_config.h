@@ -1,9 +1,8 @@
-/*
- * CLCD_config.h
- *
- *  Created on: Feb 12, 2021
- *      Author: 8
- */
+/**************************************************************************************************************************/
+/* Author: Abdellatif Maher                                                                                              */
+/* Date:   2021                                                                                                         */ 
+/* Version: V1                                                                                                         */
+/**********************************************************************************************************************/
 
 #ifndef CLCD_CONFIG_H_
 #define CLCD_CONFIG_H_
@@ -41,5 +40,16 @@
 #define CLCD_RS             DIO_PIN0
 #define CLCD_RW             DIO_PIN1
 #define CLCD_EN             DIO_PIN2
+
+
+/* Init Settings */
+#define CURSOR			1		/* 1 to Enable , 0 to Disable */
+#define BLINK			1		/* 1 to Enable , 0 to Disable */
+#define EIGHT_BITDATA 	0 		/* 1 to Enable , 0 for 4 bit */
+#define _5x10_DOT	 	0		/* 1 to Enable , 0 for 5 x 8 Dot */
+#define TWO_LINES	 	1		/* 1 to Enable , 0 for 1 Line */
+
+/* Define Upper Data to Use The Higher 4 Pins PD4 --> PD7 */
+#define UPPER_DATA_PORT 1          /* 1 for Upper pins , 0 for Lower pins */
 
 #endif /* HAL_CLCD_CLCD_CONFIG_H_ */
